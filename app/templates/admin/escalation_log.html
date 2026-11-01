@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Escalation Audit Log &bull; CivicSLA Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Escalation Audit Log</h3>
+        <p class="text-muted mb-0">Immutable records of all SLA breaches and automated supervisor promotions</p>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Escalation ID</th>
+                    <th>Complaint ID</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Transferred From</th>
+                    <th>Escalated To</th>
+                    <th>Reason</th>
+                    <th>Escalation Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs %}
+                    {% for l in logs %}
+                        <tr>
+                            <td class="fw-bold text-muted">#{{ l.escalation_id }}</td>
+                            <td>
+                                <a href="{{ url_for('admin.all_complaints') }}?status=Escalated" class="fw-bold text-decoration-none">
+                                    #{{ l.complaint_id }}
+                                </a>
+                            </td>
+                            <td>{{ l.category }}</td>
+                            <td><span class="badge badge-priority-{{ l.priority }} text-white">{{ l.priority }}</span></td>
+                            <td class="text-secondary fw-semibold">{{ l.from_officer }}</td>
+                            <td class="text-danger fw-bold"><i class="bi bi-arrow-up-circle-fill text-danger me-1"></i>{{ l.to_officer }}</td>
+                            <td><span class="badge bg-danger-subtle text-danger">{{ l.reason }}</span></td>
+                            <td class="small text-muted">{{ l.escalated_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-shield-check text-success fs-1 d-block mb-2"></i>
+                            No escalations logged yet.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

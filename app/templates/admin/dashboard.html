@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Analytics &bull; CivicSLA Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Municipal Governance Dashboard</h3>
+        <p class="text-muted mb-0">City-wide SLA tracking, department performance views &amp; automated escalation engine</p>
+    </div>
+    <div>
+        <!-- Live Stored Procedure Demonstration Button -->
+        <form method="POST" action="{{ url_for('admin.trigger_escalation') }}" class="d-inline">
+            <button type="submit" class="btn btn-danger fw-semibold shadow-sm">
+                <i class="bi bi-play-circle-fill me-1"></i> Run SLA Escalation Now
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Top KPI Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-2 col-sm-4">
+        <div class="card card-stat bg-white p-3 border-start border-4 border-primary">
+            <small class="text-muted fw-bold">TOTAL FILED</small>
+            <h3 class="fw-bold text-dark mb-0">{{ kpis.total_complaints or 0 }}</h3>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4">
+        <div class="card card-stat bg-white p-3 border-start border-4 border-success">
+            <small class="text-muted fw-bold">RESOLVED</small>
+            <h3 class="fw-bold text-success mb-0">{{ kpis.total_resolved or 0 }}</h3>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4">
+        <div class="card card-stat bg-white p-3 border-start border-4 border-warning">
+            <small class="text-muted fw-bold">PENDING</small>
+            <h3 class="fw-bold text-warning mb-0">{{ kpis.total_pending or 0 }}</h3>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4">
+        <div class="card card-stat bg-white p-3 border-start border-4 border-danger">
+            <small class="text-muted fw-bold">ESCALATED</small>
+            <h3 class="fw-bold text-danger mb-0">{{ kpis.total_escalated or 0 }}</h3>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4">
+        <div class="card card-stat bg-white p-3 border-start border-4 border-info">
+            <small class="text-muted fw-bold">AVG RESOLUTION</small>
+            <h3 class="fw-bold text-info mb-0">{{ kpis.overall_avg_hrs or 0 }} <span class="fs-6 text-muted">hrs</span></h3>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4">
+        <div class="card card-stat bg-white p-3 border-start border-4 border-warning">
+            <small class="text-muted fw-bold">CITIZEN RATING</small>
+            <h3 class="fw-bold text-warning mb-0">{{ rating_data.avg_rating or 'N/A' }} <span class="fs-6 text-muted">/ 5</span></h3>
+        </div>
+    </div>
+</div>
+
+<!-- Department Performance (View 1) & Chart -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-table me-2 text-primary"></i>Department SLA Compliance View</h5>
+                <span class="badge bg-light text-muted border">VIEW: dept_performance</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Department</th>
+                            <th>Total</th>
+                            <th>Resolved</th>
+                            <th>Escalated</th>
+                            <th>Avg Hrs</th>
+                            <th>Resolution %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in departments %}
+                            <tr>
+                                <td class="fw-semibold">{{ d.dept_name }}</td>
+                                <td>{{ d.total_complaints }}</td>
+                                <td><span class="text-success fw-bold">{{ d.resolved_count }}</span></td>
+                                <td><span class="text-danger fw-bold">{{ d.escalated_count }}</span></td>
+                                <td>{{ d.avg_resolution_hours or '-' }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 6px;">
+                                            <div class="progress-bar bg-success" style="width: {{ d.resolution_percentage or 0 }}%;"></div>
+                                        </div>
+                                        <span class="small fw-semibold">{{ d.resolution_percentage or 0 }}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Visualization -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Department Resolution vs Escalation</h5>
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center p-3">
+                <canvas id="deptChart" style="max-height: 280px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overdue Complaints (View 2) & Geographic Ward Summary (View 3) -->
+<div class="row g-4 mb-4">
+    <!-- Overdue Complaints -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0 fw-bold text-danger"><i class="bi bi-alarm-fill me-2"></i>Overdue Complaints Radar</h5>
+                    <small class="text-muted">Filtered in real-time by <code>overdue_complaints</code> view</small>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Assigned Officer</th>
+                            <th>Deadline</th>
+                            <th>Overdue By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if overdue %}
+                            {% for o in overdue %}
+                                <tr class="table-danger-subtle">
+                                    <td class="fw-bold">#{{ o.complaint_id }}</td>
+                                    <td>
+                                        <div class="fw-semibold">{{ o.category }}</div>
+                                        <div class="text-muted small">{{ o.dept_name }} &bull; {{ o.ward_name }}</div>
+                                    </td>
+                                    <td><span class="badge badge-priority-{{ o.priority }} text-white">{{ o.priority }}</span></td>
+                                    <td>{{ o.assigned_officer_name or 'Unassigned' }}</td>
+                                    <td class="small">{{ o.deadline_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td><span class="badge bg-danger text-white">+{{ o.hours_overdue }} hrs</span></td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <i class="bi bi-check-circle-fill text-success fs-3 d-block mb-1"></i>
+                                    All open complaints are currently within SLA limits.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ward Summary -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-geo-alt-fill me-2 text-primary"></i>Ward Hotspot Summary</h5>
+                    <small class="text-muted">VIEW: ward_summary</small>
+                </div>
+            </div>
+            <div class="table-responsive" style="max-height: 340px; overflow-y: auto;">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ward</th>
+                            <th>Zone</th>
+                            <th>Total</th>
+                            <th>Resolved</th>
+                            <th>Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for w in wards %}
+                            <tr>
+                                <td class="fw-semibold">{{ w.ward_name }}</td>
+                                <td><span class="badge bg-secondary-subtle text-dark">{{ w.zone }}</span></td>
+                                <td>{{ w.total_complaints }}</td>
+                                <td><span class="text-success">{{ w.resolved_count }}</span></td>
+                                <td><span class="fw-bold">{{ w.resolution_rate_pct or 0 }}%</span></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const labels = {{ departments|map(attribute='dept_name')|list|tojson }};
+        const resolvedData = {{ departments|map(attribute='resolved_count')|list|tojson }};
+        const escalatedData = {{ departments|map(attribute='escalated_count')|list|tojson }};
+
+        const ctx = document.getElementById('deptChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Resolved',
+                        data: resolvedData,
+                        backgroundColor: '#198754'
+                    },
+                    {
+                        label: 'Escalated',
+                        data: escalatedData,
+                        backgroundColor: '#dc3545'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: function(val, index) {
+                                let label = this.getLabelForValue(val);
+                                return label.split(' ')[0]; // short label
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

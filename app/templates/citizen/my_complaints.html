@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}My Complaints &bull; CivicSLA Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Citizen Portal</h3>
+        <p class="text-muted mb-0">Complaints registered by {{ session.get('name') }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('citizen.notifications') }}" class="btn btn-outline-secondary position-relative">
+            <i class="bi bi-bell"></i> Alerts
+            {% if unread_count and unread_count > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ unread_count }}
+                </span>
+            {% endif %}
+        </a>
+        <a href="{{ url_for('citizen.file_complaint') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Register New Complaint
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">My Filed Complaints ({{ complaints|length }})</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Ward / Location</th>
+                    <th>Department</th>
+                    <th>Filed On</th>
+                    <th>SLA Deadline</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if complaints %}
+                    {% for c in complaints %}
+                        <tr>
+                            <td class="fw-bold text-muted">#{{ c.complaint_id }}</td>
+                            <td>
+                                <span class="fw-semibold text-dark">{{ c.category }}</span>
+                                {% if c.description %}
+                                    <div class="text-muted small text-truncate" style="max-width: 240px;">
+                                        {{ c.description }}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge badge-priority-{{ c.priority }} text-white">
+                                    {{ c.priority }}
+                                </span>
+                            </td>
+                            <td>
+                                <div>{{ c.ward_name }} <span class="text-muted small">({{ c.zone }})</span></div>
+                                <div class="text-muted small">{{ c.location_details or '-' }}</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">{{ c.dept_name }}</span></td>
+                            <td class="small text-muted">{{ c.filed_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <div class="small fw-semibold">{{ c.deadline_at.strftime('%Y-%m-%d %H:%M') if c.deadline_at else '-' }}</div>
+                                {% if c.status in ['Open', 'InProgress'] %}
+                                    <span class="badge bg-info-subtle text-info small">Active SLA</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge badge-status-{{ c.status }} text-white">
+                                    {{ c.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('citizen.complaint_detail', complaint_id=c.complaint_id) }}" class="btn btn-sm btn-outline-primary">
+                                    Details <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            No complaints registered yet. Click "Register New Complaint" above to file one.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

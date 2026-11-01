@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Complaint #{{ complaint.complaint_id }} &bull; CivicSLA Tracker{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Complaint Overview Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted fw-bold">COMPLAINT #{{ complaint.complaint_id }}</span>
+                    <h4 class="mb-0 fw-bold mt-1">{{ complaint.category }}</h4>
+                </div>
+                <div>
+                    <span class="badge badge-status-{{ complaint.status }} fs-6 px-3 py-2 text-white">
+                        {{ complaint.status }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-md-3">
+                        <small class="text-muted d-block">Department</small>
+                        <span class="fw-semibold">{{ complaint.dept_name }}</span>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <small class="text-muted d-block">Priority</small>
+                        <span class="badge badge-priority-{{ complaint.priority }} text-white">{{ complaint.priority }}</span>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <small class="text-muted d-block">Ward &amp; Zone</small>
+                        <span class="fw-semibold">{{ complaint.ward_name }} ({{ complaint.zone }})</span>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <small class="text-muted d-block">Assigned Officer</small>
+                        <span class="fw-semibold">{{ complaint.officer_name or 'Unassigned' }}</span>
+                        {% if complaint.officer_designation %}
+                            <small class="text-muted d-block">{{ complaint.officer_designation }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="p-3 bg-light rounded-3 mb-4">
+                    <h6 class="fw-bold mb-2">Description of Problem:</h6>
+                    <p class="mb-1 text-dark">{{ complaint.description }}</p>
+                    {% if complaint.location_details %}
+                        <div class="small text-muted mt-2">
+                            <i class="bi bi-geo-alt-fill text-danger"></i> <strong>Location Landmark:</strong> {{ complaint.location_details }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3 p-3 border rounded-3 bg-white">
+                    <div class="col-md-4">
+                        <small class="text-muted d-block">Filing Timestamp</small>
+                        <strong>{{ complaint.filed_at.strftime('%Y-%m-%d %H:%M') }}</strong>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted d-block">Guaranteed SLA Deadline</small>
+                        <strong class="text-primary">{{ complaint.deadline_at.strftime('%Y-%m-%d %H:%M') if complaint.deadline_at else 'N/A' }}</strong>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted d-block">Resolved Timestamp</small>
+                        <strong class="text-success">{{ complaint.resolved_at.strftime('%Y-%m-%d %H:%M') if complaint.resolved_at else 'Pending' }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status History Audit Trail (Core DBMS Concept) -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2 text-primary"></i>Status Transition Audit Trail</h5>
+                <small class="text-muted">Recorded automatically by PostgreSQL AFTER UPDATE trigger on Status changes.</small>
+            </div>
+            <div class="card-body p-4">
+                {% if history %}
+                    <ul class="list-group list-group-flush">
+                        {% for h in history %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <span class="badge badge-status-{{ h.old_status or 'Open' }} me-1">{{ h.old_status or 'Filing' }}</span>
+                                    <i class="bi bi-arrow-right text-muted mx-1"></i>
+                                    <span class="badge badge-status-{{ h.new_status }} me-2">{{ h.new_status }}</span>
+                                    <span class="small text-muted">by Officer: {{ h.changed_by_name or 'System SLA Engine' }}</span>
+                                </div>
+                                <span class="small text-muted">{{ h.changed_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0 small">No transitions logged yet. Complaint remains in initial status.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Escalation History (if escalated) -->
+        {% if escalations %}
+            <div class="card border-0 shadow-sm mb-4 border-start border-4 border-danger">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Escalation Incident Log</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% for esc in escalations %}
+                        <div class="alert alert-danger-subtle text-danger-emphasis mb-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>From: {{ esc.from_officer_name }} &rarr; Escalated To: {{ esc.to_officer_name }}</strong>
+                                <small>{{ esc.escalated_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                            <div class="small mt-1">Reason: {{ esc.reason }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar: Citizen Feedback & Rating -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-star-fill text-warning me-2"></i>Citizen Feedback</h5>
+            </div>
+            <div class="card-body p-4">
+                {% if complaint.status == 'Resolved' %}
+                    {% if feedback %}
+                        <div class="alert alert-success border-0">
+                            <h6 class="fw-bold mb-1">Your Submitted Rating:</h6>
+                            <div class="text-warning fs-4 mb-2">
+                                {% for i in range(feedback.rating) %}★{% endfor %}{% for i in range(5 - feedback.rating) %}☆{% endfor %}
+                                <span class="text-dark fs-6 ms-1">({{ feedback.rating }}/5)</span>
+                            </div>
+                            <p class="mb-1 text-dark small">"{{ feedback.comments or 'No written comment' }}"</p>
+                            <small class="text-muted d-block mt-2">Submitted on {{ feedback.submitted_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                    {% else %}
+                        <form method="POST" action="{{ url_for('citizen.submit_feedback', complaint_id=complaint.complaint_id) }}">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Rate Resolution Quality (1-5)</label>
+                                <select name="rating" class="form-select" required>
+                                    <option value="5">★★★★★ 5 - Excellent resolution</option>
+                                    <option value="4">★★★★☆ 4 - Satisfactory</option>
+                                    <option value="3">★★★☆☆ 3 - Average</option>
+                                    <option value="2">★★☆☆☆ 2 - Poor quality</option>
+                                    <option value="1">★☆☆☆☆ 1 - Unacceptable</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Comments</label>
+                                <textarea name="comments" rows="3" class="form-control" placeholder="Share your experience with the resolution..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-warning text-dark fw-semibold w-100">
+                                Submit Citizen Review
+                            </button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <div class="text-muted small text-center py-4">
+                        <i class="bi bi-hourglass-split fs-2 d-block mb-2 text-secondary"></i>
+                        Citizen satisfaction review unlocks as soon as this complaint reaches <strong>Resolved</strong> status.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-grid">
+            <a href="{{ url_for('citizen.my_complaints') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Complaints
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
