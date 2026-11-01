@@ -16,14 +16,14 @@ export default function ProjectBanner() {
       <div className="container project-banner-inner">
         <div className="project-banner-content">
           <GraduationCap className="project-banner-icon" size={16} aria-hidden="true" />
-          <span className="project-banner-badge">Academic Prototype</span>
+          <span className="project-banner-badge">DBMS Project</span>
           <p className="project-banner-text">
-            College Demonstration Project • Designed for municipal grievance tracking and SLA escalation modeling. Not an official government portal.
+            Municipal Complaint Tracker &bull; Enforced by PostgreSQL Triggers, Stored Procedures &amp; Recursive CTE Escalation Engine.
           </p>
         </div>
         <div className="project-banner-tag">
           <Info size={14} aria-hidden="true" />
-          <span>Sample Data Only</span>
+          <span>PostgreSQL 17 Active</span>
         </div>
       </div>
     </aside>

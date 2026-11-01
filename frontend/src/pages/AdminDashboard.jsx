@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BarChart3, ShieldAlert, PieChart, Users, AlertOctagon, CheckCircle2, Clock, ArrowRight, Layers } from 'lucide-react';
+import { BarChart3, ShieldAlert, PieChart, Users, AlertOctagon, CheckCircle2, Clock, ArrowRight, Layers, Zap } from 'lucide-react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import ProjectBanner from '../components/common/ProjectBanner';
@@ -11,7 +11,7 @@ import Button from '../components/common/Button';
 import { useComplaints } from '../context/ComplaintContext';
 
 export default function AdminDashboard() {
-  const { complaints } = useComplaints();
+  const { complaints, runEscalation, escalationNotice, isLoading } = useComplaints();
   const navigate = useNavigate();
 
   const total = complaints.length;
@@ -48,7 +48,16 @@ export default function AdminDashboard() {
               Central executive oversight for departmental complaint velocity, breach monitoring, and administrative escalation routing.
             </p>
           </div>
-          <div className="dashboard-actions">
+          <div className="dashboard-actions" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <Button
+              variant="outline"
+              size="md"
+              onClick={runEscalation}
+              disabled={isLoading}
+              style={{ borderColor: '#DC2626', color: '#DC2626', backgroundColor: '#FEF2F2', fontWeight: 600 }}
+            >
+              <Zap size={16} /> {isLoading ? 'Executing Procedure...' : 'Run SLA Escalation (PostgreSQL)'}
+            </Button>
             <Button
               variant="primary"
               size="md"
@@ -59,6 +68,13 @@ export default function AdminDashboard() {
             </Button>
           </div>
         </div>
+
+        {escalationNotice && (
+          <div className="track-alert" style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', marginBottom: '1.5rem' }}>
+            <Zap size={18} aria-hidden="true" />
+            <span>{escalationNotice}</span>
+          </div>
+        )}
 
         {/* Executive Stats Cards */}
         <div className="stats-grid">

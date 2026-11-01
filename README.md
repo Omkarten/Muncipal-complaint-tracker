@@ -32,13 +32,12 @@ This project solves that by building a digital complaint tracker where the **dat
 ## 🏗️ Architecture
 
 ```
-┌──────────────┐       ┌──────────────────┐       ┌─────────────────────┐
-│   Frontend   │──────▶│  Flask Backend   │──────▶│    PostgreSQL DB    │
-│  HTML/CSS    │       │  (Python)        │       │                     │
-│  Bootstrap 5 │       │  + APScheduler   │       │  Triggers ·         │
-└──────────────┘       └──────────────────┘       │  Procedures ·       │
-                                                  │  Views · Roles      │
-                                                  └─────────────────────┘
+┌────────────────────────┐         ┌─────────────────────────┐         ┌─────────────────────────┐
+│     React 18 Frontend   │────────▶│      Flask Backend      │────────▶│      PostgreSQL 17      │
+│  Vite · Lucide · Router │         │    Python 3 · REST API  │         │                         │
+│  (Landing, Citizen,     │◀────────│    + APScheduler        │◀────────│  Triggers · Procedures  │
+│   Officer & Admin)      │  JSON   │  (Runs SLA Job Hourly)  │ psycopg2│  Views · Roles · CTEs   │
+└────────────────────────┘         └─────────────────────────┘         └─────────────────────────┘
 ```
 
 ## 🗃️ Database Schema
@@ -100,12 +99,11 @@ Strategic indexes on frequently queried columns (`status + deadline_at`, `citize
 
 | Layer | Technology | Rationale |
 |---|---|---|
-| **Database** | PostgreSQL 15+ | Superior trigger/procedure support, native CHECK constraints, `pg_cron` extension |
-| **Backend** | Python + Flask | Lightweight, connects via `psycopg2` (raw SQL — no ORM hiding queries) |
-| **Scheduler** | APScheduler (Python) | Runs `escalate_overdue_complaints()` every hour |
-| **Frontend** | HTML / CSS / Bootstrap 5 | Clean, responsive UI with role-based dashboards |
-| **Charts** | Chart.js | Lightweight client-side charts for dashboards |
-| **ER Diagram** | draw.io / dbdiagram.io | Free tools for clean, exportable diagrams |
+| **Database** | PostgreSQL 15+ (v17) | Superior trigger/procedure support, native CHECK constraints, stored procedures |
+| **Backend** | Python + Flask (REST API) | Lightweight, connects via `psycopg2` (raw SQL — no ORM hiding queries) |
+| **Frontend** | React 18 + Vite | Modern single-page application with responsive civic design, Lucide icons, and role views |
+| **Scheduler** | APScheduler (Python) | Runs `escalate_overdue_complaints()` automatically on schedule |
+| **Alternative SSR UI** | Jinja2 + Bootstrap 5 | Classic server-rendered view accessible at `/classic` |
 | **Version Control** | Git + GitHub | Collaboration and project history |
 
 ## 🚀 Getting Started
@@ -113,10 +111,10 @@ Strategic indexes on frequently queried columns (`status + deadline_at`, `citize
 ### Prerequisites
 
 - Python 3.9+
-- PostgreSQL 15+
-- pip
+- PostgreSQL 15+ (or Docker)
+- Node.js 18+ & npm (for frontend development)
 
-### Installation
+### Installation & Run
 
 1. **Clone the repository**
    ```bash
@@ -136,21 +134,32 @@ Strategic indexes on frequently queried columns (`status + deadline_at`, `citize
    psql -d municipal_complaints -f sql/07_seed_data.sql
    ```
 
-3. **Install Python dependencies**
+3. **Install Python dependencies & configure environment**
    ```bash
+   python -m venv .venv
+   source .venv/bin/activate
    pip install -r requirements.txt
-   ```
-
-4. **Configure environment variables**
-   ```bash
    cp .env.example .env
-   # Edit .env with your database credentials
    ```
 
-5. **Run the application**
+4. **Build Frontend (Production SPA)**
+   ```bash
+   cd frontend
+   npm install
+   npm run build
+   cd ..
+   ```
+
+5. **Start the Application**
    ```bash
    python run.py
    ```
+   * Open `http://localhost:5000` to view the full **React 18 Frontend** connected directly to the PostgreSQL backend!
+   * (Optional) For live React hot-reloading development:
+     ```bash
+     cd frontend && npm run dev
+     ```
+     The Vite dev server runs on `http://localhost:3000` with an active proxy to the Flask backend.
 
 ## 📊 Sample Analytical Queries
 

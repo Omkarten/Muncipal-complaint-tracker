@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, Clock, AlertTriangle, AlertOctagon, CheckCircle2, ArrowRight, UserCheck, Layers } from 'lucide-react';
+import { ShieldAlert, Clock, AlertTriangle, AlertOctagon, CheckCircle2, ArrowRight, UserCheck, Layers, Zap } from 'lucide-react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import ProjectBanner from '../components/common/ProjectBanner';
@@ -11,7 +11,7 @@ import Button from '../components/common/Button';
 import { useComplaints } from '../context/ComplaintContext';
 
 export default function SlaMonitoringPage() {
-  const { complaints } = useComplaints();
+  const { complaints, runEscalation, escalationNotice, isLoading } = useComplaints();
 
   const tier1Complaints = complaints.filter(c => c.escalationTier === 'Tier 1');
   const tier2Complaints = complaints.filter(c => c.escalationTier === 'Tier 2');
@@ -35,7 +35,25 @@ export default function SlaMonitoringPage() {
               Real-time monitoring of complaint resolution velocity across Tier 1 (Ward), Tier 2 (Sub-Division), and Tier 3 (Commissioner) governance levels.
             </p>
           </div>
+          <div className="dashboard-actions">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={runEscalation}
+              disabled={isLoading}
+              style={{ borderColor: '#DC2626', color: '#DC2626', backgroundColor: '#FEF2F2', fontWeight: 600 }}
+            >
+              <Zap size={16} /> {isLoading ? 'Executing Procedure...' : 'Trigger SLA Escalation (PostgreSQL)'}
+            </Button>
+          </div>
         </div>
+
+        {escalationNotice && (
+          <div className="track-alert" style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', marginBottom: '1.5rem' }}>
+            <Zap size={18} aria-hidden="true" />
+            <span>{escalationNotice}</span>
+          </div>
+        )}
 
         {/* 3-Tier Escalation Overview Cards */}
         <div className="sla-tier-grid">
