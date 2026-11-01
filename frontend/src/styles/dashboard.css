@@ -1,0 +1,598 @@
+/* ==========================================================================
+   DASHBOARD & CIVIC MODULE STYLES
+   College Demonstration: Municipal Complaint Tracker with SLA Escalation
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. DASHBOARD WRAPPER & HEADER
+   -------------------------------------------------------------------------- */
+.dashboard-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-canvas);
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: var(--space-8) 0 var(--space-16) 0;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.dashboard-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--space-1);
+}
+
+.dashboard-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.dashboard-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* --------------------------------------------------------------------------
+   2. DEMO ROLE INDICATOR BAR
+   -------------------------------------------------------------------------- */
+.demo-role-banner {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding: var(--space-2) 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.demo-role-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: var(--font-size-xs);
+  flex-wrap: wrap;
+}
+
+.role-switch-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.role-switch-label {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.role-pill-btn {
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.role-pill-btn:hover {
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-primary);
+}
+
+.role-pill-active {
+  background-color: var(--color-brand-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-brand-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* --------------------------------------------------------------------------
+   3. STATS METRICS CARDS
+   -------------------------------------------------------------------------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  padding: var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.stat-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon-blue {
+  background-color: #EFF6FF;
+  color: #1D4ED8;
+}
+
+.stat-icon-green {
+  background-color: #F0FDF4;
+  color: #166534;
+}
+
+.stat-icon-amber {
+  background-color: #FFFBEB;
+  color: #B45309;
+}
+
+.stat-icon-red {
+  background-color: #FEF2F2;
+  color: #DC2626;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.1;
+}
+
+.stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+/* --------------------------------------------------------------------------
+   4. CIVIC DATA TABLES
+   -------------------------------------------------------------------------- */
+.table-container {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  margin-bottom: var(--space-8);
+}
+
+.table-header-bar {
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.table-header-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.civic-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.civic-table th {
+  background-color: var(--color-bg-subtle);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--color-border-strong);
+  white-space: nowrap;
+}
+
+.civic-table td {
+  padding: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-subtle);
+  vertical-align: middle;
+}
+
+.civic-table tr:last-child td {
+  border-bottom: none;
+}
+
+.civic-table tr:hover td {
+  background-color: #F8FAFC;
+}
+
+.table-mono {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
+  color: var(--color-interactive);
+}
+
+.table-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   5. FORM STYLES (COMPLAINT SUBMISSION & AUTH)
+   -------------------------------------------------------------------------- */
+.form-card {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-8);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.form-grid-full {
+  grid-column: 1 / -1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-required {
+  color: #DC2626;
+  font-weight: var(--font-weight-bold);
+  margin-left: 2px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: #FFFFFF;
+  color: var(--color-text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--color-interactive);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+  outline: none;
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-error {
+  font-size: var(--font-size-xs);
+  color: #DC2626;
+  font-weight: var(--font-weight-medium);
+}
+
+.form-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   6. SUCCESS CONFIRMATION MODAL / CARD
+   -------------------------------------------------------------------------- */
+.success-card {
+  max-width: 640px;
+  margin: var(--space-8) auto;
+  padding: var(--space-8);
+  text-align: center;
+}
+
+.success-icon-badge {
+  width: 64px;
+  height: 64px;
+  background-color: #F0FDF4;
+  color: #166534;
+  border: 2px solid #BBF7D0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-4) auto;
+}
+
+.success-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.success-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.success-ticket-box {
+  background-color: var(--color-bg-subtle);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.success-ticket-label {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-1);
+}
+
+.success-ticket-id {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-interactive);
+  letter-spacing: 0.05em;
+}
+
+.success-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* --------------------------------------------------------------------------
+   7. TRACKING TIMELINE
+   -------------------------------------------------------------------------- */
+.timeline-card {
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  position: relative;
+  padding-left: var(--space-6);
+  border-left: 2px solid var(--color-border-subtle);
+  margin: var(--space-4) 0 0 var(--space-3);
+}
+
+.timeline-step {
+  position: relative;
+}
+
+.timeline-bullet {
+  position: absolute;
+  left: calc(-1 * var(--space-6) - 7px);
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--color-interactive);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 0 0 2px var(--color-interactive);
+}
+
+.timeline-bullet-active {
+  background-color: #10B981;
+  box-shadow: 0 0 0 2px #10B981;
+}
+
+.timeline-bullet-escalated {
+  background-color: #DC2626;
+  box-shadow: 0 0 0 2px #DC2626;
+}
+
+.timeline-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 2px;
+  display: block;
+}
+
+.timeline-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-normal);
+}
+
+/* --------------------------------------------------------------------------
+   8. AUTHENTICATION / LOGIN TABS
+   -------------------------------------------------------------------------- */
+.auth-container {
+  max-width: 520px;
+  margin: var(--space-10) auto;
+  padding: var(--space-8);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.auth-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.auth-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border-subtle);
+  margin-bottom: var(--space-6);
+}
+
+.auth-tab {
+  flex: 1;
+  text-align: center;
+  padding: var(--space-3) 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.auth-tab-active {
+  color: var(--color-interactive);
+  border-bottom-color: var(--color-interactive);
+}
+
+.quick-demo-accounts {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px dashed var(--color-border-strong);
+}
+
+.quick-demo-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-bottom: var(--space-3);
+  text-align: center;
+}
+
+.quick-demo-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-2);
+}
+
+@media (max-width: 480px) {
+  .quick-demo-buttons {
+    grid-template-columns: 1fr;
+  }
+}
+
+.quick-account-btn {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-subtle);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.quick-account-btn:hover {
+  background-color: #E2E8F0;
+  border-color: var(--color-brand-primary);
+}
+
+/* --------------------------------------------------------------------------
+   9. SLA MONITORING SPECIFIC CARDS
+   -------------------------------------------------------------------------- */
+.sla-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+@media (max-width: 900px) {
+  .sla-tier-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sla-monitor-card {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sla-monitor-card-t1 {
+  border-top: 4px solid var(--color-status-on-schedule-text);
+}
+
+.sla-monitor-card-t2 {
+  border-top: 4px solid var(--color-status-warning-text);
+}
+
+.sla-monitor-card-t3 {
+  border-top: 4px solid var(--color-status-escalated-text);
+}
